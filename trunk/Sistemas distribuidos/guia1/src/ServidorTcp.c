@@ -1,14 +1,9 @@
 #include <stdio.h>
 #include <sys/socket.h>
-#include <unistd.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <string.h>
-#include <time.h>
-#include <sys/types.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
-#include <sys/time.h>
+#include "utiles_ping.c"
 
 int main(int argc, char** argv)
 {
@@ -21,24 +16,8 @@ int main(int argc, char** argv)
 	
 	int puerto= 2222;
 
-	int c;
-	while ((c= getopt(argc, argv, "p::")) != -1)
-	{
-		switch(c)
-		{
-			case 'p':
-			{
-				puerto = atoi(optarg);
-				if (puerto <1024 || puerto > 65535)
-				{
-					printf ("El puerto debe estar comprendido entre 1024 y 65535\n");
-					return -1;
-				}
-				break;
-			}			
-		}
-	}
-	
+	if (parsear_parametros_servidor(argc, argv, &puerto)<0)
+	    return -1;
 	
 	
 	// Crear socket
