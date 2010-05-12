@@ -86,13 +86,14 @@ int parsear_parametros_cliente(int argc, char* argv[],  char **ip, int *puerto, 
 
 char* generar_paquete(int tamanio)
 {
-	char* res = malloc(tamanio*sizeof(char));
+	char* res = malloc((tamanio+1)*sizeof(char));
 	int i;
 	for (i = 0; i<tamanio; i++)
 	{
 		res[i] = (char)(i%10 + 48);
 	}
-	return res;
+	res[tamanio]='\0';
+	return res; 
 }
 
 struct timeval start;      /* for timing */
@@ -136,6 +137,20 @@ int finalizar_temporizador()
 		return tiempo;
 }
 
+char * str_hora_actual()
+{
+	struct tm *ptr;
+    time_t lt;
+    //obtenemos tiempo actual
+    lt = time(NULL);
+    //obtenemos tiempo local
+    ptr = localtime(&lt);
+    //obtenemos un string formateado con el tiempo local
+    char * res= malloc(9*sizeof(char));
+    strftime(res, 9, "%H:%M:%S", ptr);
+    return res;
+}
+
 struct ResultadosTemporizador obtener_resultados_temporizador()
 {
     if (res.Cantidad!= 0)
@@ -145,4 +160,12 @@ struct ResultadosTemporizador obtener_resultados_temporizador()
     return res;
 }
 
+void imprimir_resultados_ping(char *IP)
+{
+    struct ResultadosTemporizador r= obtener_resultados_temporizador();
+    printf("========================================================\n");
+    printf("Ping a: %s\n", IP);
+    printf("RTT min: %d uSeg, max: %d uSeg, prom: %.2f uSeg\n", r.Minimo, r.Maximo, r.Promedio);
+    printf("========================================================\n");
+}
 
