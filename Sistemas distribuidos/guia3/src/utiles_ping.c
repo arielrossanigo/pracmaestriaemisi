@@ -1,9 +1,19 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/time.h>
 #include <time.h>
 #include <unistd.h>
 
-tvsub( out, in )
+char * nombre_host()
+{
+	size_t len = 126;
+	char * hostname = malloc(128);
+	gethostname (hostname, len);
+	return hostname;
+}
+
+void tvsub( out, in )
 struct timeval *out, *in;
 {
 	if( (out->tv_usec -= in->tv_usec) < 0 )   {
@@ -13,39 +23,11 @@ struct timeval *out, *in;
 	out->tv_sec -= in->tv_sec;
 }
 
-int parsear_parametros_servidor(int argc, char* argv[],   int *puerto)
-{
-	int c;
-	while ((c= getopt(argc, argv, "p::")) != -1)
-	{
-		switch(c)
-		{
-			case 'p':
-			{
-				*puerto = atoi(optarg);
-				if (*puerto <1024 || *puerto > 65535)
-				{
-					printf ("El puerto debe estar comprendido entre 1024 y 65535\n");
-					return -1;
-				}
-				break;
-			}			
-		}
-	}
-    return 0;
-}
 
-int parsear_parametros_cliente(int argc, char* argv[],  char **ip, int *puerto, int *repeticiones, int *tamanio)
+int parsear_parametros_cliente(int argc, char* argv[], int *repeticiones, int *tamanio)
 {
-	if (argc < 2)
-	{
-		printf ("Error. Uso: %s <IPservidor> [-p <puerto>] [-r <repeticiones>] [-s <tamaño>]\n", argv[0]);
-		return -1;
-	}
-	*ip= argv[1];
-	
 	int c;
-	while ((c= getopt(argc, argv, "r::p::s::")) != -1)
+	while ((c= getopt(argc, argv, "r::s::")) != -1)
 	{
 		switch(c)
 		{
@@ -65,16 +47,6 @@ int parsear_parametros_cliente(int argc, char* argv[],  char **ip, int *puerto, 
 				if (*tamanio <1 || *tamanio > 10001)
 				{
 					printf ("El tamano debe estar comprendido entre 1 y 10001\n");
-					return -1;
-				}
-				break;
-			}			
-			case 'p':
-			{
-				*puerto = atoi(optarg);
-				if (*puerto <1024 || *puerto > 65535)
-				{
-					printf ("El puerto debe estar comprendido entre 1024 y 65535\n");
 					return -1;
 				}
 				break;
@@ -111,7 +83,7 @@ struct ResultadosTemporizador res;
 
 void iniciar_resultados_temporizador()
 {
-    res.Minimo = 10000000;
+    res.Minimo = 0;
     res.Maximo = -1;
     res.Cantidad= 0;
     res.Total = 0;
@@ -160,12 +132,16 @@ struct ResultadosTemporizador obtener_resultados_temporizador()
     return res;
 }
 
-void imprimir_resultados_ping(char *IP)
+void imprimir_resultados()
 {
     struct ResultadosTemporizador r= obtener_resultados_temporizador();
     printf("========================================================\n");
-    printf("Ping a: %s\n", IP);
     printf("RTT min: %d uSeg, max: %d uSeg, prom: %.2f uSeg\n", r.Minimo, r.Maximo, r.Promedio);
     printf("========================================================\n");
 }
+
+
+
+
+
 

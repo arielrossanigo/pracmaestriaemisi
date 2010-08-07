@@ -128,9 +128,9 @@ int finalizar_temporizador()
 		gettimeofday( &stop, &tz );		
 		tvsub( &stop, &start );		
 		tiempo =  stop.tv_sec * 1000000 + stop.tv_usec;
-		if (res.Minimo > tiempo)
+		if (res.Minimo > tiempo || res.Cantidad==0)
 		    res.Minimo = tiempo;
-		if (res.Maximo < tiempo)
+		if (res.Maximo < tiempo || res.Cantidad==0)
 		    res.Maximo = tiempo;
 		res.Total += tiempo;
 		res.Cantidad++;
